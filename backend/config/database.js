@@ -19,9 +19,9 @@ const databaseConfig = {
   },
   
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
-  
+
   dialectOptions: {
-    ssl: process.env.NODE_ENV === 'production' ? {
+    ssl: process.env.NODE_ENV === 'production' && process.env.DB_HOST !== 'postgres' ? {
       require: true,
       rejectUnauthorized: false
     } : false

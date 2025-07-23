@@ -1,6 +1,24 @@
 import axios from 'axios'
 
-const API_BASE_URL = process.env.REACT_APP_API_URL
+// Determinar la URL base del API dinámicamente
+const getApiBaseUrl = () => {
+  // En desarrollo local, usar localhost
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3001/api'
+  }
+  
+  // En producción, usar la variable de entorno si existe
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL
+  }
+  
+  // Fallback para desarrollo con Docker Compose
+  return '/api'
+}
+
+const API_BASE_URL = getApiBaseUrl()
+
+console.log('API Base URL:', API_BASE_URL)
 
 const api = axios.create({
   baseURL: API_BASE_URL,

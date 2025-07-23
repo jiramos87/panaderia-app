@@ -4,14 +4,21 @@ import { Product, Order, OrderProduct } from '../models/associations.js'
 async function syncDatabase(force = false) {
   try {
     console.log('🔄 Iniciando sincronización de base de datos...')
-
+    
     await sequelize.sync({ force })
     
     if (force) {
       console.log('⚠️  Base de datos recreada desde cero')
       await seedInitialData()
     } else {
-      console.log('✅ Base de datos sincronizada correctamente')
+      // Verificar si necesitamos datos iniciales
+      const productCount = await Product.count()
+      if (productCount === 0) {
+        console.log('📋 Base de datos vacía, agregando datos iniciales...')
+        await seedInitialData()
+      } else {
+        console.log('✅ Base de datos sincronizada correctamente')
+      }
     }
     
     return true
