@@ -6,13 +6,14 @@ import dotenv from 'dotenv'
 
 import { testConnection } from './config/database.js'
 import { syncDatabase } from './config/sync.js'
-
+import productRoutes from './routes/products.js'
+import orderRoutes from './routes/orders.js'
 
 dotenv.config()
 
 const app = express()
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 8080
 
 app.use(helmet())
 
@@ -42,6 +43,9 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString()
     })
 })
+
+app.use('/api/products', productRoutes)
+app.use('/api/orders', orderRoutes)
 
 app.use((req, res, next) => {
   res.status(404).json({

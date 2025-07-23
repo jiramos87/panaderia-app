@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Servicio de base de datos PostgreSQL
+  # Este contenedor simula exactamente cómo funcionará Cloud SQL en producción
+  postgres:
+    image: postgres:15-alpine
+    container_name: panaderia_postgres
+    environment:
+      # Estas variables configuran la base de datos inicial
+      POSTGRES_DB: panaderia_local
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      # Mapear puerto 5432 del contenedor al 5433 del host
+      # Usamos 5433 para evitar conflictos con PostgreSQL local si lo tienes
+      - "5433:5432"
+    volumes:
+      # Volumen persistente para que los datos sobrevivan reinicios de contenedor
+      - postgres_data:/var/lib/postgresql/data
+      # Script de inicialización para crear usuario y permisos
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - panaderia_network
+    healthcheck:
+      # Verificación de salud para asegurar que el servicio esté listo
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Servicio del backend API
+  # Este contenedor simula cómo funcionará en Cloud Run
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: panaderia_backend
+    environment:
+      # Variables específicas para el entorno containerizado
+      NODE_ENV: production
+      PORT: 8080
+      # Conexión a la base de datos usando el nombre del servicio
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: panaderia_local
+      DB_USER: postgres
+      DB_PASSWORD: postgres_password
+      DB_DIALECT: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        # Esperar hasta que PostgreSQL esté completamente saludable
+        condition: service_healthy
+    networks:
+      - panaderia_network
+    volumes:
+      # Montar código fuente para desarrollo (opcional)
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  # Servicio del frontend React
+  # En producción esto sería servido por nginx en Cloud Run
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: panaderia_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - panaderia_network
+    restart: unless-stopped
+
+# Definir la red que conecta todos los servicios
+networks:
+  panaderia_network:
+    driver: bridge
+
+# Definir volúmenes persistentes
+volumes:
+  postgres_data:
+    driver: local
