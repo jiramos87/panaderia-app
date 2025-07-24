@@ -1,0 +1,47 @@
+# Dependencias de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Archivos de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.docker
+
+# Build outputs
+build/
+dist/
+
+# Archivos de sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE/editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Temporales
+*.tmp
+*.temp
+
+# Archivos específicos del lab
+dbpassword
+deployment-evidence.txt
+EOF
