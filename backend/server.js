@@ -12,19 +12,11 @@ import orderRoutes from './routes/orders.js'
 dotenv.config()
 
 const app = express()
-
 const PORT = process.env.PORT || 8080
 
 app.use(helmet())
-
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
-    credentials: true
-}))
-
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173', 'https://*.run.app'], credentials: true }))
 app.use(morgan('combined'))
-
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -32,61 +24,41 @@ app.get('/', (req, res) => {
     res.json({ 
         message: 'API de Panadería funcionando correctamente',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV 
+        environment: process.env.NODE_ENV,
+        port: PORT
     })
 })
 
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'OK',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-    })
+    res.json({ status: 'OK', uptime: process.uptime(), timestamp: new Date().toISOString() })
 })
 
 app.use('/api/products', productRoutes)
 app.use('/api/orders', orderRoutes)
 
 app.use((req, res, next) => {
-  res.status(404).json({
-      error: 'Ruta no encontrada',
-      path: req.originalUrl,
-      method: req.method
-  })
+    res.status(404).json({ error: 'Ruta no encontrada', path: req.originalUrl })
 })
 
 app.use((error, req, res, next) => {
-    console.error('Error capturado:', error);
-    res.status(500).json({
-        error: 'Error interno del servidor',
-        message: process.env.NODE_ENV === 'development' ? error.message : 'Algo salió mal'
-    })
+    console.error('Error:', error)
+    res.status(500).json({ error: 'Error interno del servidor' })
 })
 
 async function initializeServer() {
-  console.log('🚀 Iniciando aplicación de panadería...')
-  
-  const connectionSuccessful = await testConnection()
-  if (!connectionSuccessful) {
-    console.log('❌ No se pudo conectar a la base de datos. Cerrando servidor...')
-    process.exit(1)
-  }
-  
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  const syncSuccessful = await syncDatabase(isDevelopment)
-  
-  if (!syncSuccessful) {
-    console.log('❌ No se pudo sincronizar la base de datos. Cerrando servidor...')
-    process.exit(1)
-  }
-
-  app.listen(PORT, () => {
-    console.log('🎉 ¡Aplicación iniciada exitosamente!')
-    console.log(`🌐 Servidor: http://localhost:${PORT}`)
-    console.log(`📊 Entorno: ${process.env.NODE_ENV}`)
-    console.log(`💾 Base de datos: Conectada y sincronizada`)
-    console.log('📋 Para detener el servidor presiona Ctrl+C')
-  })
+    console.log(`🚀 Iniciando aplicación en puerto ${PORT}`)
+    
+    const connectionSuccessful = await testConnection()
+    if (connectionSuccessful) {
+        const isDevelopment = process.env.NODE_ENV === 'development'
+        await syncDatabase(isDevelopment)
+    } else {
+        console.log('⚠️ Continuando sin base de datos')
+    }
+    
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`✅ Servidor funcionando en puerto ${PORT}`)
+    })
 }
 
 initializeServer()
