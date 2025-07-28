@@ -47,11 +47,13 @@ app.use((error, req, res, next) => {
 
 async function initializeServer() {
     console.log(`🚀 Iniciando aplicación en puerto ${PORT}`)
+    console.log(`🌍 Entorno: ${process.env.NODE_ENV}`)
+    console.log(`🗄️ DB Host: ${process.env.DB_HOST}`)
+    console.log(`👤 DB User: ${process.env.DB_USER}`)
     
     const connectionSuccessful = await testConnection()
     if (connectionSuccessful) {
-        const isDevelopment = process.env.NODE_ENV === 'development'
-        await syncDatabase(isDevelopment)
+        await syncDatabase(true)
     } else {
         console.log('⚠️ Continuando sin base de datos')
     }

@@ -1,7 +1,7 @@
 import { sequelize } from './database.js'
 import { Product, Order, OrderProduct } from '../models/associations.js'
 
-async function syncDatabase(force = false) {
+async function syncDatabase(force = true) {
   try {
     console.log('🔄 Iniciando sincronización de base de datos...')
     
