@@ -1,44 +1,47 @@
-Panadería App - Google Cloud Serverless Deployment
+# Panadería App - Google Cloud Serverless Deployment
+
 A full-stack bakery e-commerce application built with Node.js backend and React frontend, deployed on Google Cloud using serverless technologies (Cloud Run + Cloud SQL).
-Features
 
-🥖 Product catalog with bakery items
-🛒 Shopping cart functionality
-📋 Order management
-🔐 Secure database with Secret Manager
-🚀 Serverless deployment on Google Cloud
-🐳 Containerized with Docker
+## Features
 
-Tech Stack
-Backend:
+- 🥖 Product catalog with bakery items
+- 🛒 Shopping cart functionality
+- 📋 Order management
+- 🔐 Secure database with Secret Manager
+- 🚀 Serverless deployment on Google Cloud
+- 🐳 Containerized with Docker
 
-Node.js with Express
-Sequelize ORM
-PostgreSQL (Cloud SQL)
-Secret Manager for password security
+## Tech Stack
 
-Frontend:
+**Backend:**
+- Node.js with Express
+- Sequelize ORM
+- PostgreSQL (Cloud SQL)
+- Secret Manager for password security
 
-React 19
-Axios for API calls
-Responsive CSS design
+**Frontend:**
+- React 19
+- Axios for API calls
+- Responsive CSS design
 
-Infrastructure:
+**Infrastructure:**
+- Google Cloud Run (serverless containers)
+- Cloud SQL (PostgreSQL)
+- Artifact Registry (Docker images)
+- Secret Manager (secure credentials)
 
-Google Cloud Run (serverless containers)
-Cloud SQL (PostgreSQL)
-Artifact Registry (Docker images)
-Secret Manager (secure credentials)
+## Prerequisites
 
-Prerequisites
+- Google Cloud Platform account with billing enabled
+- GCP lab environment or Cloud Shell access
+- Git installed
 
-Google Cloud Platform account with billing enabled
-GCP lab environment or Cloud Shell access
-Git installed
+## Quick Deployment
 
-Quick Deployment
 Copy and paste the following commands into your GCP Cloud Shell:
-bash# Panadería App Deployment - Copy and paste all commands below
+
+```bash
+# Panadería App Deployment - Copy and paste all commands below
 
 # Clone repository and install dependencies
 git clone https://github.com/jiramos87/panaderia-app.git
@@ -128,37 +131,43 @@ echo "✅ Deployment complete!"
 echo "Backend API: $BACKEND_URL/api/products"
 FRONTEND_URL=$(gcloud run services describe panaderia-frontend --region=$REGION --format="value(status.url)")
 echo "Frontend App: $FRONTEND_URL"
-Important Notes
-Before Deployment
+```
 
-Update REGION variable: Change us-west1 to match your lab's assigned region
-Verify lab permissions: Ensure you have sufficient permissions in your GCP lab environment
+## Important Notes
 
-Key Architecture Decisions
+### Before Deployment
+- **Update REGION variable**: Change `us-west1` to match your lab's assigned region
+- **Verify lab permissions**: Ensure you have sufficient permissions in your GCP lab environment
 
-Password Security: Uses echo -n to avoid newline issues that cause authentication failures
-CORS Configuration: Backend allows all origins (origin: true) for simplicity
-SSL Configuration: Disabled for Cloud SQL Unix socket connections (handled by proxy)
-Build Order: Backend must be deployed before frontend to get the API URL
+### Key Architecture Decisions
+- **Password Security**: Uses `echo -n` to avoid newline issues that cause authentication failures
+- **CORS Configuration**: Backend allows all origins (`origin: true`) for simplicity
+- **SSL Configuration**: Disabled for Cloud SQL Unix socket connections (handled by proxy)
+- **Build Order**: Backend must be deployed before frontend to get the API URL
 
-Troubleshooting
+### Troubleshooting
+- **Frontend not loading products**: Check browser console for CORS errors
+- **Database connection issues**: Verify password file creation and Secret Manager setup
+- **Build failures**: Ensure npm dependencies are installed in both directories
 
-Frontend not loading products: Check browser console for CORS errors
-Database connection issues: Verify password file creation and Secret Manager setup
-Build failures: Ensure npm dependencies are installed in both directories
+## Testing the Deployment
 
-Testing the Deployment
 After successful deployment, you can test:
 
-Backend API: Visit [BACKEND_URL]/api/products to see the product list
-Frontend App: Visit [FRONTEND_URL] to use the full application
-Health Check: Visit [BACKEND_URL]/health for backend status
+1. **Backend API**: Visit `[BACKEND_URL]/api/products` to see the product list
+2. **Frontend App**: Visit `[FRONTEND_URL]` to use the full application
+3. **Health Check**: Visit `[BACKEND_URL]/health` for backend status
 
-Architecture
+## Architecture
+
+```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   React App     │    │   Express API    │    │   PostgreSQL    │
 │  (Cloud Run)    │───▶│  (Cloud Run)     │───▶│  (Cloud SQL)    │
 │   Frontend      │    │    Backend       │    │    Database     │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
-License
+```
+
+## License
+
 MIT License - Feel free to use this project for learning and development purposes.
