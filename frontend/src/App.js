@@ -13,6 +13,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(null)
   const [productsLoading, setProductsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     loadProducts()
@@ -21,11 +22,21 @@ function App() {
   const loadProducts = async () => {
     try {
       setProductsLoading(true)
+      setError(null)
+      console.log('Loading products...')
       const response = await productService.getAll()
-      setProducts(response.data.data)
+      console.log('api response:', response.data)
+      if (response.data && response.data.data) {
+        setProducts(response.data.data)
+      } else {
+        console.error('Unexpected API response format:', response.data)
+        setError('Error cargando productos. Verifica tu conexión.')
+        setProducts([])
+      }
     } catch (error) {
       console.error('Error loading products:', error)
-      alert('Error cargando productos. Verifica tu conexión.')
+      setError('Error cargando productos. Verifica tu conexión.')
+      setProducts([])
     } finally {
       setProductsLoading(false)
     }
@@ -120,6 +131,33 @@ function App() {
     )
   }
 
+  if (productsLoading) {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1>Panadería Online</h1>
+        </header>
+        <main className="main-content">
+          <p>Cargando productos...</p>
+        </main>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1>Panadería Online</h1>
+        </header>
+        <main className="main-content">
+          <p>{error}</p>
+          <button onClick={loadProducts}>Reintentar</button>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -130,9 +168,7 @@ function App() {
         <div className="products-section">
           <h2>Nuestros Productos</h2>
           <div className="products-grid">
-            {productsLoading ? (
-              <div className="loading-message">Cargando productos...</div>
-            ) : (
+            {Array.isArray(products) && products.length > 0 ? (
               products.map(product => (
               <div key={product.id} className="product-card">
                 <h3>{product.name}</h3>
@@ -143,6 +179,8 @@ function App() {
                 </button>
               </div>
             ))
+            ) : (
+              <div className="loading-message">No hay productos disponibles</div>
             )}
           </div>
         </div>
