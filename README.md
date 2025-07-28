@@ -3,7 +3,18 @@
 # 1. Clone repository and install dependencies
 git clone https://github.com/jiramos87/panaderia-app.git
 cd panaderia-app
-# Run: npm install in both frontend/ and backend/ directories, then return to panaderia-app/
+
+# Install backend dependencies
+echo "📦 Installing backend dependencies..."
+cd backend
+npm install
+cd ..
+
+# Install frontend dependencies
+echo "📦 Installing frontend dependencies..."
+cd frontend
+npm install
+cd ..
 
 # 2. Set environment variables (update REGION based on your lab assignment)
 INSTANCE_NAME=postgres-instance
